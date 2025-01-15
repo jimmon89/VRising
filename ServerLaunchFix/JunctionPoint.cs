@@ -109,7 +109,54 @@ namespace ServerLaunchFix
 
             if (!Directory.Exists(targetDir))
                 throw new IOException("Target path does not exist or is not a directory.");
-            Directory.CreateDirectory(junctionPoint);
+
+            if (Directory.Exists(junctionPoint))
+            {
+                if (!overwrite)
+                    throw new IOException("Directory already exists and overwrite parameter is false.");
+            }
+            else
+            {
+                Directory.CreateDirectory(junctionPoint);
+            }
+
+            using (var handle = OpenReparsePoint(junctionPoint, EFileAccess.GenericWrite))
+            {
+                var targetDirBytes = Encoding.Unicode.GetBytes(NonInterpretedPathPrefix + Path.GetFullPath(targetDir));
+
+                var reparseDataBuffer =
+                    new REPARSE_DATA_BUFFER
+                    {
+                        ReparseTag = IO_REPARSE_TAG_MOUNT_POINT,
+                        ReparseDataLength = (ushort)(targetDirBytes.Length + 12),
+                        SubstituteNameOffset = 0,
+                        SubstituteNameLength = (ushort)targetDirBytes.Length,
+                        PrintNameOffset = (ushort)(targetDirBytes.Length + 2),
+                        PrintNameLength = 0,
+                        PathBuffer = new byte[0x3ff0]
+                    };
+
+                Array.Copy(targetDirBytes, reparseDataBuffer.PathBuffer, targetDirBytes.Length);
+
+                var inBufferSize = Marshal.SizeOf(reparseDataBuffer);
+                var inBuffer = Marshal.AllocHGlobal(inBufferSize);
+
+                try
+                {
+                    Marshal.StructureToPtr(reparseDataBuffer, inBuffer, false);
+
+                    int bytesReturned;
+                    var result = DeviceIoControl(handle.DangerousGetHandle(), FSCTL_SET_REPARSE_POINT,
+                        inBuffer, targetDirBytes.Length + 20, IntPtr.Zero, 0, out bytesReturned, IntPtr.Zero);
+
+                    if (!result)
+                        ThrowLastWin32Error("Unable to create junction point.");
+                }
+                finally
+                {
+                    Marshal.FreeHGlobal(inBuffer);
+                }
+            }
         }
 
         /// <summary>
