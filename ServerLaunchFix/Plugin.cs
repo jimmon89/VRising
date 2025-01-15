@@ -76,22 +76,6 @@ namespace ServerLaunchFix
             {
                 Directory.CreateDirectory(serverBepInExDir);
             }
-
-            foreach (var entry in Directory.GetDirectories(Paths.BepInExRootPath))
-            {
-                var name = Path.GetFileName(entry);
-                var destination = Path.Combine(serverBepInExDir, name);
-                if (name is "cache" or "config" or "interop")
-                {
-                    RecursiveCopyIfNewer(entry, destination);
-                }
-                else
-                {
-                    JunctionPoint.Create(Path.GetFullPath(destination), Path.GetFullPath(entry), true);
-                }
-            }
-
-            File.WriteAllText(Path.Combine(serverBepInExDir, "config", "BepInEx.cfg"), BepInExConfig);
             return Path.Combine(serverBepInExDir, "core", "BepInEx.Unity.IL2CPP.dll");
         }
         
