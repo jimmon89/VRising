@@ -6,7 +6,7 @@ namespace = "Mythic"
 name = "ServerLaunchFix"
 versionNumber = "0.2.0-test-no-symlink"
 description = "Enable mods for single player and host & play"
-websiteUrl = "https://github.com/MythicManiac/VRising"
+websiteUrl = "https://github.com/jimmon89/VRising"
 containsNsfwContent = false
 
 [package.dependencies]
