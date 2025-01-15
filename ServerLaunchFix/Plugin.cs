@@ -161,7 +161,7 @@ Enabled = false
                 }
                 else
                 {
-                    JunctionPoint.Create(Path.GetFullPath(destination), Path.GetFullPath(entry), true);
+                    RecursiveCopyIfNewer(Path.GetFullPath(entry), Path.GetFullPath(destination));
                 }
             }
 
