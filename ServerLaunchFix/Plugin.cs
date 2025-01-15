@@ -87,7 +87,6 @@ namespace ServerLaunchFix
         {
             if (ServerLaunchFix.IsServerExe(fileName))
             {
-                ServerLaunchFix.PrepareBuiltInServer();
                 ServerLaunchFix.Instance.PushDoorstopEnvironment();
                 arguments += ServerLaunchFix.BuildServerLaunchExtraArgs();
             }
