@@ -41,12 +41,6 @@ namespace ServerLaunchFix
         private readonly Stack<Dictionary<string, string>> _environmentStack = new();
 
         [DllImport("kernel32.dll")]
-        static extern bool CreateSymbolicLink(string lpSymlinkFileName, string lpTargetFileName, SymbolicLink dwFlags);
-        private enum SymbolicLink
-        {
-            File = 0,
-            Directory = 1
-        }
 
         private const string DoorstopConfig = @"
 # General options for Unity Doorstop
