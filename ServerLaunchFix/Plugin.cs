@@ -40,8 +40,6 @@ namespace ServerLaunchFix
         public static readonly ServerLaunchFix Instance = new();
         private readonly Stack<Dictionary<string, string>> _environmentStack = new();
 
-        [DllImport("kernel32.dll")]
-
         private const string DoorstopConfig = @"
 # General options for Unity Doorstop
 [General]
