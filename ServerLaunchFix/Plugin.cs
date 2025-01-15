@@ -155,7 +155,14 @@ Enabled = false
             {
                 var name = Path.GetFileName(entry);
                 var destination = Path.Combine(serverBepInExDir, name);
-                RecursiveCopyIfNewer(entry, destination);
+                if (name is "cache" or "config" or "interop")
+                {
+                    RecursiveCopyIfNewer(entry, destination);
+                }
+                else
+                {
+                    JunctionPoint.Create(Path.GetFullPath(destination), Path.GetFullPath(entry), true);
+                }
             }
 
             File.WriteAllText(Path.Combine(serverBepInExDir, "config", "BepInEx.cfg"), BepInExConfig);
