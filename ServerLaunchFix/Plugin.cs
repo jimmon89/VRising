@@ -61,28 +61,40 @@ namespace ServerLaunchFix
             }
         }
 
-        public static void PrepareBuiltInServer()
+        private static string PrepareServerBepInEx()
         {
-            if (!IsClient) return;
-
-            const string doorstopFilename = "winhttp.dll";
-            var doorstopPath = Path.Combine(Paths.GameRootPath, doorstopFilename);
-            if (!File.Exists(doorstopPath))
+            var profileDir = Path.GetDirectoryName(Paths.BepInExRootPath);
+            if (profileDir == null)
             {
-                ServerLaunchFixPlugin.Instance.Log.LogError("Doorstop not found, unable to copy to server!");
+                ServerLaunchFixPlugin.Instance.Log.LogError("Unable to find BepInEx install dir!");
                 ServerLaunchFixPlugin.Instance.Log.LogError("Server mods might not work");
-                return;
+                return null;
             }
 
-            var serverDir = Path.Combine(Paths.GameRootPath, "VRising_Server");
-            if (!Directory.Exists(serverDir))
+            var serverBepInExDir = Path.Combine(profileDir, "BepInEx_Server");
+            if (!Directory.Exists(serverBepInExDir))
             {
-                ServerLaunchFixPlugin.Instance.Log.LogError("Built-in server not found, unable to configure mods!");
-                ServerLaunchFixPlugin.Instance.Log.LogError("Server mods might not work");
-                return;
+                Directory.CreateDirectory(serverBepInExDir);
             }
 
-            File.WriteAllText(Path.Combine(serverDir, "doorstop_config.ini"), DoorstopConfig);
+            foreach (var entry in Directory.GetDirectories(Paths.BepInExRootPath))
+            {
+                var name = Path.GetFileName(entry);
+                var destination = Path.Combine(serverBepInExDir, name);
+                if (name is "cache" or "config" or "interop")
+                {
+                    RecursiveCopyIfNewer(entry, destination);
+                }
+                else
+                {
+                    JunctionPoint.Create(Path.GetFullPath(destination), Path.GetFullPath(entry), true);
+                }
+            }
+
+            File.WriteAllText(Path.Combine(serverBepInExDir, "config", "BepInEx.cfg"), BepInExConfig);
+            return Path.Combine(serverBepInExDir, "core", "BepInEx.Unity.IL2CPP.dll");
+        }
+
         }
         
         public static bool IsClient => Application.productName == "VRising";
