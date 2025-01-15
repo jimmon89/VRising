@@ -61,6 +61,30 @@ namespace ServerLaunchFix
             }
         }
 
+        public static void PrepareBuiltInServer()
+        {
+            if (!IsClient) return;
+
+            const string doorstopFilename = "winhttp.dll";
+            var doorstopPath = Path.Combine(Paths.GameRootPath, doorstopFilename);
+            if (!File.Exists(doorstopPath))
+            {
+                ServerLaunchFixPlugin.Instance.Log.LogError("Doorstop not found, unable to copy to server!");
+                ServerLaunchFixPlugin.Instance.Log.LogError("Server mods might not work");
+                return;
+            }
+
+            var serverDir = Path.Combine(Paths.GameRootPath, "VRising_Server");
+            if (!Directory.Exists(serverDir))
+            {
+                ServerLaunchFixPlugin.Instance.Log.LogError("Built-in server not found, unable to configure mods!");
+                ServerLaunchFixPlugin.Instance.Log.LogError("Server mods might not work");
+                return;
+            }
+
+            File.WriteAllText(Path.Combine(serverDir, "doorstop_config.ini"), DoorstopConfig);
+        }
+        
         public static bool IsClient => Application.productName == "VRising";
 
         public static bool IsServerExe(string filePath)
