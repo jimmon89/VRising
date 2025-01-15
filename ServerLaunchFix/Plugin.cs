@@ -39,6 +39,7 @@ namespace ServerLaunchFix
     {
         public static readonly ServerLaunchFix Instance = new();
         private readonly Stack<Dictionary<string, string>> _environmentStack = new();
+        
         public void PushDoorstopEnvironment()
         {
             var doorstopEnv = new Dictionary<string, string>();
@@ -61,17 +62,12 @@ namespace ServerLaunchFix
         }
 
         public static bool IsClient => Application.productName == "VRising";
-
+        
         public static bool IsServerExe(string filePath)
         {
             return Path.GetFileName(filePath) == "VRisingServer.exe";
         }
-
-        public static string BuildServerLaunchExtraArgs()
-        {
-            var doorstopTarget = Path.Combine(Path.GetDirectoryName(Paths.GameRootPath), "VRising_Server", "BepInEx_Server", "core", "BepInEx.Unity.IL2CPP.dll");
-            return $" --doorstop-enable true --doorstop-target-assembly \"{doorstopTarget}\"";
-        }
+        
     }
 
     [HarmonyPatch(typeof(StunProcess_PInvoke), nameof(StunProcess_PInvoke.Start))]
@@ -82,7 +78,8 @@ namespace ServerLaunchFix
             if (ServerLaunchFix.IsServerExe(fileName))
             {
                 ServerLaunchFix.Instance.PushDoorstopEnvironment();
-                arguments += ServerLaunchFix.BuildServerLaunchExtraArgs();
+                var doorstopTarget = Path.Combine(Path.GetDirectoryName(Paths.GameRootPath), "VRising_Server", "BepInEx_Server", "core", "BepInEx.Unity.IL2CPP.dll");
+                arguments += $" --doorstop-enable true --doorstop-target-assembly \"{doorstopTarget}\"";
             }
         }
 
