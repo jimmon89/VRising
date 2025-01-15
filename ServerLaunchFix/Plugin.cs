@@ -64,18 +64,7 @@ namespace ServerLaunchFix
         private static string PrepareServerBepInEx()
         {
             var profileDir = Path.GetDirectoryName(Paths.BepInExRootPath);
-            if (profileDir == null)
-            {
-                ServerLaunchFixPlugin.Instance.Log.LogError("Unable to find BepInEx install dir!");
-                ServerLaunchFixPlugin.Instance.Log.LogError("Server mods might not work");
-                return null;
-            }
-
             var serverBepInExDir = Path.Combine(profileDir, "BepInEx_Server");
-            if (!Directory.Exists(serverBepInExDir))
-            {
-                Directory.CreateDirectory(serverBepInExDir);
-            }
             return Path.Combine(serverBepInExDir, "core", "BepInEx.Unity.IL2CPP.dll");
         }
         
