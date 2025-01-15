@@ -94,8 +94,6 @@ namespace ServerLaunchFix
             File.WriteAllText(Path.Combine(serverBepInExDir, "config", "BepInEx.cfg"), BepInExConfig);
             return Path.Combine(serverBepInExDir, "core", "BepInEx.Unity.IL2CPP.dll");
         }
-
-        }
         
         public static bool IsClient => Application.productName == "VRising";
 
